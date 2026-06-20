@@ -1,34 +1,34 @@
-const Favorite = require('../models/Favorite');
-const Country = require('../models/Country');
+import Favorite from "../models/Favorite.js";
+import Country from "../models/Country.js";
 
-exports.getFavorites = async (req, res) => {
+export const getFavorites = async (req, res) => {
   try {
-    const favorites = await Favorite.find().populate('country');
+    const favorites = await Favorite.find().populate("country");
     // Filter out entries where country might have been deleted
-    const validFavorites = favorites.filter(f => f.country !== null);
-    
+    const validFavorites = favorites.filter((f) => f.country !== null);
+
     res.status(200).json({
       success: true,
       count: validFavorites.length,
-      data: validFavorites
+      data: validFavorites,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Server Error fetching favorites',
-      error: error.message
+      message: "Server Error fetching favorites",
+      error: error.message,
     });
   }
 };
 
-exports.addFavorite = async (req, res) => {
+export const addFavorite = async (req, res) => {
   try {
     const { countryId } = req.body;
 
     if (!countryId) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a countryId'
+        message: "Please provide a countryId",
       });
     }
 
@@ -36,7 +36,7 @@ exports.addFavorite = async (req, res) => {
     if (!country) {
       return res.status(404).json({
         success: false,
-        message: 'Country not found'
+        message: "Country not found",
       });
     }
 
@@ -44,28 +44,28 @@ exports.addFavorite = async (req, res) => {
     if (favorite) {
       return res.status(400).json({
         success: false,
-        message: 'Country is already favorited'
+        message: "Country is already favorited",
       });
     }
 
     favorite = await Favorite.create({ country: countryId });
-    
-    const populated = await Favorite.findById(favorite._id).populate('country');
+
+    const populated = await Favorite.findById(favorite._id).populate("country");
 
     res.status(201).json({
       success: true,
-      data: populated
+      data: populated,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Server Error adding favorite',
-      error: error.message
+      message: "Server Error adding favorite",
+      error: error.message,
     });
   }
 };
 
-exports.removeFavorite = async (req, res) => {
+export const removeFavorite = async (req, res) => {
   try {
     const { countryId } = req.params;
 
@@ -74,20 +74,20 @@ exports.removeFavorite = async (req, res) => {
     if (!favorite) {
       return res.status(404).json({
         success: false,
-        message: 'Favorite record not found for this country'
+        message: "Favorite record not found for this country",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Country removed from favorites',
-      data: favorite
+      message: "Country removed from favorites",
+      data: favorite,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Server Error removing favorite',
-      error: error.message
+      message: "Server Error removing favorite",
+      error: error.message,
     });
   }
 };

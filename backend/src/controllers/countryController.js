@@ -1,6 +1,6 @@
-const Country = require('../models/Country');
+import Country from "../models/Country.js";
 
-exports.getCountries = async (req, res) => {
+export const getCountries = async (req, res) => {
   try {
     const { search, region, sortBy, order, page = 1, limit = 12 } = req.query;
     const query = {};
@@ -8,20 +8,20 @@ exports.getCountries = async (req, res) => {
     // Search matching name, officialName, capital, or cca3
     if (search) {
       query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { officialName: { $regex: search, $options: 'i' } },
-        { capital: { $regex: search, $options: 'i' } },
-        { cca3: { $regex: search, $options: 'i' } }
+        { name: { $regex: search, $options: "i" } },
+        { officialName: { $regex: search, $options: "i" } },
+        { capital: { $regex: search, $options: "i" } },
+        { cca3: { $regex: search, $options: "i" } },
       ];
     }
 
     if (region) {
-      query.region = { $regex: `^${region}$`, $options: 'i' };
+      query.region = { $regex: `^${region}$`, $options: "i" };
     }
 
-    let sortObj = {};
+    const sortObj = {};
     if (sortBy) {
-      const sortOrder = order === 'desc' ? -1 : 1;
+      const sortOrder = order === "desc" ? -1 : 1;
       sortObj[sortBy] = sortOrder;
     } else {
       sortObj.name = 1; // Default sort by name ascending
@@ -44,25 +44,25 @@ exports.getCountries = async (req, res) => {
         total,
         page: pageNum,
         limit: limitNum,
-        pages: Math.ceil(total / limitNum)
+        pages: Math.ceil(total / limitNum),
       },
-      data: countries
+      data: countries,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Server Error fetching countries',
-      error: error.message
+      message: "Server Error fetching countries",
+      error: error.message,
     });
   }
 };
 
-exports.getCountryById = async (req, res) => {
+export const getCountryById = async (req, res) => {
   try {
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid Country ID format'
+        message: "Invalid Country ID format",
       });
     }
 
@@ -70,24 +70,24 @@ exports.getCountryById = async (req, res) => {
     if (!country) {
       return res.status(404).json({
         success: false,
-        message: 'Country not found'
+        message: "Country not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: country
+      data: country,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Server Error fetching country',
-      error: error.message
+      message: "Server Error fetching country",
+      error: error.message,
     });
   }
 };
 
-exports.getCountryByCode = async (req, res) => {
+export const getCountryByCode = async (req, res) => {
   try {
     const { code } = req.params;
     const country = await Country.findOne({ cca3: code.toUpperCase() });
@@ -95,19 +95,19 @@ exports.getCountryByCode = async (req, res) => {
     if (!country) {
       return res.status(404).json({
         success: false,
-        message: `Country with code ${code.toUpperCase()} not found`
+        message: `Country with code ${code.toUpperCase()} not found`,
       });
     }
 
     res.status(200).json({
       success: true,
-      data: country
+      data: country,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Server Error fetching country by code',
-      error: error.message
+      message: "Server Error fetching country by code",
+      error: error.message,
     });
   }
 };
